@@ -17,27 +17,27 @@ flowchart LR
     classDef git fill:#fbe9e7,stroke:#bf360c,stroke-width:2px;
 
     %% 1. Developer Area
-    subgraph Development [1. Code & Build]
-        Dev[Developer] -->|Push Code| AppRepo[App Git Repo]
-        AppRepo -->|Trigger| CI[CI Pipeline\n(GitHub Actions)]
-        CI -->|Push Image| ECR[Amazon ECR\n(Docker Registry)]
+    subgraph Development ["1. Code & Build"]
+        Dev[Developer] -->|Push Code| AppRepo["App Git Repo"]
+        AppRepo -->|Trigger| CI["CI Pipeline\n(GitHub Actions)"]
+        CI -->|Push Image| ECR["Amazon ECR\n(Docker Registry)"]
     end
 
     %% 2. GitOps Area
-    subgraph GitOps [2. Desired State]
-        CI -->|Update Tag| ManRepo[Manifest/Infra Repo\n(Helm/YAML)]
+    subgraph GitOps ["2. Desired State"]
+        CI -->|Update Tag| ManRepo["Manifest/Infra Repo\n(Helm/YAML)"]
     end
 
     %% 3. EKS Cluster Area (The Destination)
-    subgraph EKS [3. Amazon EKS Cluster]
+    subgraph EKS ["3. Amazon EKS Cluster"]
         
         %% Argo CD Internals (Your Core Components)
-        subgraph ArgoCore [Argo CD Namespace]
+        subgraph ArgoCore ["Argo CD Namespace"]
             direction TB
-            API[API Server]
-            RepoServ[Repo Server]
-            Redis[Redis Cache]
-            Controller[App Controller]
+            API["API Server"]
+            RepoServ["Repo Server"]
+            Redis["Redis Cache"]
+            Controller["App Controller"]
             
             API --- RepoServ
             RepoServ --- Redis
@@ -45,7 +45,7 @@ flowchart LR
         end
 
         %% The Target App
-        TargetApp[Live Application]
+        TargetApp["Live Application"]
     end
 
     %% The Critical Connections
