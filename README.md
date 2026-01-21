@@ -78,3 +78,52 @@ You mentioned distinct repositories: **Application Repo** vs. **Infrastructure/M
 * (This will make you sound very experienced).
 
 You are ready. This diagram covers every point your manager asked for. Good luck!
+
+
+
+To be crystal clear: **Argo CD sits INSIDE your EKS Cluster.**
+
+It is not a website running on someone's laptop or a separate cloud server. It is a set of "Pods" (containers) running directly on the same infrastructure as your application.
+
+### 1. Where is it in the diagram?
+
+In the Mermaid code I gave you above, look at **Section 3**.
+
+* **The Outer Box:** `subgraph EKS ["3. Amazon EKS Cluster"]`
+* **The Inner Box:** `subgraph ArgoCore ["Argo CD Namespace"]`
+
+**The "Visual Proof":** Because the `ArgoCore` box is **inside** the `EKS` box, that tells any engineer: *"This software is installed on the cluster itself."*
+
+### 2. What to say to your Manager
+
+If they ask, *"Where is Argo actually running?"*, use this answer to sound professional:
+
+> "Argo CD is installed **in-cluster**. It runs in its own namespace (usually called `argocd`) within our EKS cluster. This allows it to communicate directly with the Kubernetes API to manage our deployments securely, without needing external access keys."
+
+### 3. Diagram Highlight
+
+Here is a zoomed-in view of just that part so you can see the relationship clearly.
+
+```mermaid
+flowchart TB
+    subgraph EKS_Cluster ["AWS EKS Cluster (The Infrastructure)"]
+        style EKS_Cluster fill:#fff3e0,stroke:#e65100,stroke-width:2px
+        
+        subgraph Namespace ["Namespace: argocd"]
+            style Namespace fill:#f3e5f5,stroke:#4a148c,stroke-width:2px,stroke-dasharray: 5 5
+            ArgoController[Argo CD Controller]
+        end
+        
+        subgraph AppNamespace ["Namespace: production"]
+            style AppNamespace fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+            MyApp[Your Application]
+        end
+        
+        %% The connection that matters
+        ArgoController -->|Manages| MyApp
+    end
+
+```
+
+**Key Takeaway for you:**
+Think of Argo CD like a **maintenance robot** that lives inside the factory (EKS). It doesn't commute to work; it lives there so it can fix things immediately.
