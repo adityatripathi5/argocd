@@ -149,17 +149,17 @@ flowchart LR
     %% --- ZONE 1: The Build Factory (Outside EKS) ---
     subgraph SourceBuild ["ZONE 1: Source Code & CI Process"]
         direction TB
-        Dev([Developer]) -->|"1. Pushes Code"| AppRepo["Application Git Repo\n(Source Code)"]
-        AppRepo -->|"2. Triggers"| CI["CI Pipeline\n(e.g., GitHub Actions)"]
+        Dev([Developer]) -->|"1. Pushes Code"| AppRepo["Application Git Repo"]
+        AppRepo -->|"2. Triggers"| CI["CI Pipeline (GitHub Actions)"]
         
         subgraph GitOps["GitOps Config"]
-             InfraRepo["Manifest/Infra Repo\n(Helm/YAML)"]
+             InfraRepo["Manifest/Infra Repo (Helm/YAML)"]
         end
     end
 
     %% --- ZONE 2: The Artifact Warehouse (AWS) ---
     subgraph Storage ["ZONE 2: Artifact Storage (AWS)"]
-        ECR[("Amazon ECR\n(Docker Image Registry)")]
+        ECR[("Amazon ECR (Images)")]
     end
 
     %% Connections between Zone 1 and 2
@@ -167,17 +167,16 @@ flowchart LR
     CI -.->|"4. Updates Image Tag"| InfraRepo
 
     %% --- ZONE 3: The Destination (AWS EKS CLUSTER) ---
-    %% This is the "Zoomed In" part showing WHERE Argo lives.
     subgraph EKS ["ZONE 3: AWS EKS Cluster (Live Environment)"]
         direction TB
         
         %% ARGO CD IS HERE -> INSIDE EKS
-        subgraph ArgoNS ["Namespace: argocd (The GitOps Engine)"]
+        subgraph ArgoNS ["Namespace: argocd"]
             direction TB
-            ArgoAPI["Argo CD API Server\n(UI/CLI)"]
-            ArgoRepoServ["Repo Server\n(Clones Git, generates manifests)"]
-            ArgoRedis[("Redis Cache\n(Performance)")]
-            ArgoController["Application Controller\n(The Brain: Syncs State)"]
+            ArgoAPI["Argo CD API Server"]
+            ArgoRepoServ["Repo Server"]
+            ArgoRedis[("Redis Cache")]
+            ArgoController["Application Controller"]
             
             %% Internal Argo Connections
             ArgoAPI --- ArgoRepoServ
@@ -186,17 +185,17 @@ flowchart LR
         end
 
         %% YOUR ACTUAL APPLICATION IS HERE -> ALSO INSIDE EKS
-        subgraph AppNS ["Namespace: production (Your Workloads)"]
+        subgraph AppNS ["Namespace: production"]
             LiveApp["Live Application Pods"]
         end
 
         %% The Critical Sync Connection inside EKS
-        ArgoController ==>"6. Applies Changes (Kubernetes API)"==> LiveApp
+        ArgoController ==>|"6. Applies Changes"| LiveApp
     end
 
     %% --- Final Connections spanning zones ---
     %% Argo sits inside EKS, but reaches OUT to get manifests
-    InfraRepo -.- |"5. Argo detects change & Pulls Manifests"|ArgoRepoServ
+    InfraRepo -.- |"5. Detects & Pulls Manifests"|ArgoRepoServ
     
     %% The Live App sits inside EKS, but reaches OUT to grab the image
     LiveApp -.- |"7. Pulls Docker Image"| ECR
