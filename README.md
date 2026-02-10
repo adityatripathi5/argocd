@@ -1,3 +1,6 @@
+
+https://opstree.slack.com/files/U07UFCGGQQP/F0AEES0LCGZ/untitled_diagram-page-2.drawio.svg
+
 This is **excellent**. You have gone from a "beginner" understanding to a "professional" architectural view. The text you provided is exactly how a Senior DevOps Engineer would describe it.
 
 Yes, you should definitely use this version. It shows you understand the **entire lifecycle** (CI + CD), not just the final step.
